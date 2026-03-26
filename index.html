@@ -153,40 +153,40 @@ tr.expand-row td{padding:16px 12px;background:var(--s2);text-align:left}
 <div class="hdr">
 <div class="hdr-tag">PMAX BD Operating System</div>
 <h1>BD Scoring V2 — Top 100 Companies</h1>
-<p>941 cong ty da cham diem theo 2 lop (Opportunity + Activity). Data tu HubSpot + Client Activities Master.</p>
+<p>941 công ty đã chấm điểm theo 2 lớp (Opportunity + Activity). Data từ HubSpot + Client Activities Master.</p>
 </div>
 
 <div class="tabs-nav">
 <button class="tab-btn active" onclick="switchTab('scoring',this)">Scoring</button>
-<button class="tab-btn" onclick="switchTab('guide',this)">Huong dan & Giai thich</button>
+<button class="tab-btn" onclick="switchTab('guide',this)">Hướng dẫn & Giải thích</button>
 </div>
 
 <!-- ==================== TAB 1: SCORING ==================== -->
 <div class="tab-content active" id="tab-scoring">
 <div class="stats" id="stats"></div>
 <div class="filter-section">
-<div class="filter-label">Phan loai Tier</div>
+<div class="filter-label">Phân loại Tier</div>
 <div class="filter-row">
-<button class="btn on" data-tier="all" onclick="setTier('all',this)">Tat ca</button>
+<button class="btn on" data-tier="all" onclick="setTier('all',this)">Tất cả</button>
 <button class="btn" data-tier="A-Hot" onclick="setTier('A-Hot',this)">A-Hot</button>
 <button class="btn" data-tier="B-Warm" onclick="setTier('B-Warm',this)">B-Warm</button>
 <button class="btn" data-tier="C-Nurt" onclick="setTier('C-Nurt',this)">C-Nurt</button>
 <button class="btn" data-tier="D-Cold" onclick="setTier('D-Cold',this)">D-Cold</button>
 <span class="count-tag" id="countTag"></span>
 </div>
-<div class="filter-label">Hanh dong uu tien</div>
+<div class="filter-label">Hành động ưu tiên</div>
 <div class="filter-row">
-<button class="btn on" data-act="all" onclick="setAction('all',this)">Tat ca</button>
-<button class="btn" data-act="q-now" onclick="setAction('q-now',this)">Can day trong quy nay</button>
-<button class="btn" data-act="q-next" onclick="setAction('q-next',this)">Follow up quy ke</button>
-<button class="btn" data-act="delivery" onclick="setAction('delivery',this)">Dang trien khai</button>
-<input class="search" id="search" placeholder="Tim kiem cong ty, nganh, owner...">
+<button class="btn on" data-act="all" onclick="setAction('all',this)">Tất cả</button>
+<button class="btn" data-act="q-now" onclick="setAction('q-now',this)">Cần đẩy trong quý này</button>
+<button class="btn" data-act="q-next" onclick="setAction('q-next',this)">Follow up quý kế</button>
+<button class="btn" data-act="delivery" onclick="setAction('delivery',this)">Đang triển khai</button>
+<input class="search" id="search" placeholder="Tìm kiếm công ty, ngành, owner...">
 </div>
 </div>
 <div class="tbl-wrap">
 <table>
 <thead><tr>
-<th>#</th><th class="left" style="min-width:180px">Cong ty</th><th>Nganh</th><th>Owner</th><th>Stage</th><th>Tier</th>
+<th>#</th><th class="left" style="min-width:180px">Công ty</th><th>Ngành</th><th>Owner</th><th>Stage</th><th>Tier</th>
 <th class="g-d1">D1.1</th><th class="g-d1">D1.2</th><th class="g-d1">D1.3</th>
 <th class="g-d2">D2.1</th><th class="g-d2">D2.2</th><th class="g-d2">D2.3</th>
 <th class="g-d3">D3.1</th><th class="g-d3">D3.2</th><th class="g-d3">D3.3</th>
@@ -195,7 +195,7 @@ tr.expand-row td{padding:16px 12px;background:var(--s2);text-align:left}
 <th class="g-d6">D6.1</th><th class="g-d6">D6.2</th><th class="g-d6">D6.3</th>
 <th class="g-opp">OPP</th>
 <th class="g-a">A1</th><th class="g-a">A2a</th><th class="g-a">A2b</th><th class="g-a">A3i</th><th class="g-a">A3s</th><th class="g-a">A3l</th><th class="g-a">A4s</th><th class="g-a">A4d</th><th class="g-a">A4m</th>
-<th class="g-act">ACT</th><th class="g-tot">Tong</th><th style="min-width:140px">Recommendation</th>
+<th class="g-act">ACT</th><th class="g-tot">Tổng</th><th style="min-width:140px">Recommendation</th>
 </tr></thead>
 <tbody id="tbody"></tbody>
 </table>
@@ -207,125 +207,125 @@ tr.expand-row td{padding:16px 12px;background:var(--s2);text-align:left}
 <div class="guide">
 
 <div class="guide-section">
-<h2>Scoring Framework V2 la gi?</h2>
-<p>Day la he thong cham diem 2 lop, duoc thiet ke de tra loi cau hoi cot loi cua team BD: <strong style="color:var(--tx)">"Trong 941 cong ty, cong ty nao nen danh, bang gi, vao luc nao, va ai nen lam?"</strong></p>
-<p style="margin-top:8px">He thong cham diem cu chi co 1 lop (Activity Score) — do luong PMAX da tuong tac voi khach den dau. Van de la: mot cong ty co the co activity cao nhung co hoi thuc te thap (deal nho, ngoai nganh, mua sai thoi diem). Nguoc lai, mot cong ty co activity thap nhung la co hoi vang (deal lon, dung nganh, dang mua cao diem).</p>
-<p style="margin-top:8px">Scoring V2 bo sung them <strong style="color:var(--cyan)">Lop 1: Opportunity Score</strong> — danh gia khach quan cong ty co dang theo duoi khong, doc lap voi viec PMAX da lam gi.</p>
+<h2>Scoring Framework V2 là gì?</h2>
+<p>Đây là hệ thống chấm điểm 2 lớp, được thiết kế để trả lời câu hỏi cốt lõi của team BD: <strong style="color:var(--tx)">"Trong 941 công ty, công ty nào nên đánh, bằng gì, vào lúc nào, và ai nên làm?"</strong></p>
+<p style="margin-top:8px">Hệ thống chấm điểm cũ chỉ có 1 lớp (Activity Score) — đo lường PMAX đã tương tác với khách đến đâu. Vấn đề là: một công ty có thể có activity cao nhưng cơ hội thực tế thấp (deal nhỏ, ngoài ngành, mùa sai thời điểm). Ngược lại, một công ty có activity thấp nhưng là cơ hội vàng (deal lớn, đúng ngành, đang mùa cao điểm).</p>
+<p style="margin-top:8px">Scoring V2 bổ sung thêm <strong style="color:var(--cyan)">Lớp 1: Opportunity Score</strong> — đánh giá khách quan công ty có đáng theo đuổi không, độc lập với việc PMAX đã làm gì.</p>
 </div>
 
 <div class="guide-section">
-<h3>Vi sao tach 2 layer?</h3>
+<h3>Vì sao tách 2 layer?</h3>
 <div class="dim-explain">
 <div class="guide-card">
-<h4 style="color:var(--cyan)">Lop 1: Opportunity Score (toi da 100 diem)</h4>
-<p>Tra loi: "Cong ty nay co dang danh khong?"<br>6 chieu: Doanh thu, San pham, Mua vu, Cau truc mua, Trien khai, Quan he.<br>Data tu: HubSpot deals, vertical mapping, lich mua vu, contacts job title, source.</p>
+<h4 style="color:var(--cyan)">Lớp 1: Opportunity Score (tối đa 100 điểm)</h4>
+<p>Trả lời: "Công ty này có đáng đánh không?"<br>6 chiều: Doanh thu, Sản phẩm, Mùa vụ, Cấu trúc mua, Triển khai, Quan hệ.<br>Data từ: HubSpot deals, vertical mapping, lịch mùa vụ, contacts job title, source.</p>
 </div>
 <div class="guide-card">
-<h4 style="color:var(--blue)">Lop 2: Activity Score (toi da 100 diem)</h4>
-<p>Tra loi: "PMAX dang o dau voi cong ty nay?"<br>4 chieu: Pipeline stage, Cuong do tuong tac, ICP fit, Momentum.<br>Data tu: HubSpot lifecycle stage, Client Activities Master, company profile.</p>
+<h4 style="color:var(--blue)">Lớp 2: Activity Score (tối đa 100 điểm)</h4>
+<p>Trả lời: "PMAX đang ở đâu với công ty này?"<br>4 chiều: Pipeline stage, Cường độ tương tác, ICP fit, Momentum.<br>Data từ: HubSpot lifecycle stage, Client Activities Master, company profile.</p>
 </div>
 </div>
-<p>Khi ket hop 2 lop, ta thay duoc: Opportunity cao + Activity thap = "vang chua dao" (can kich hoat ngay). Opportunity thap + Activity cao = "dang lang phi effort" (can danh gia lai).</p>
-</div>
-
-<div class="guide-section">
-<h3>Giai thich tung Dimension</h3>
-<p style="margin-bottom:12px;font-weight:600;color:var(--cyan)">Lop 1: Opportunity Score</p>
-<div class="dim-explain">
-<div class="dim-ex-card">
-<h4>D1. Tiem nang Doanh thu</h4><div class="pts">25 diem | 3 tieu chi</div>
-<p>D1.1 Quy mo deal (max 10): tu deal data tren HubSpot, chia theo nguong 500tr/300tr/100tr moi thang.<br>D1.2 Ty suat GP2 (max 8): tu Est. GP2 / Deal Amount. Tren 25% = 8d, 15-25% = 5d.<br>D1.3 CLV (max 7): xu huong doanh thu khach cu — <span style="color:var(--red)">hien thieu data</span>, can file Finance.</p>
-</div>
-<div class="dim-ex-card">
-<h4>D2. Do phu hop San pham</h4><div class="pts">20 diem | 3 tieu chi</div>
-<p>D2.1 SP chinh khop (max 10): tu Group Product tren HubSpot. Media Performance/Branding = 10d (core PMAX 66% GP2).<br>D2.2 Ban cheo (max 5): tu dong mapping theo vertical. Beauty/FMCG/Home = 5d (nhieu SP co the ban).<br>D2.3 Chien luoc (max 5): tu dong mapping theo ma tran Ansoff. Nganh trong tam = 5d.</p>
-</div>
-<div class="dim-ex-card">
-<h4>D3. Thoi diem Mua vu</h4><div class="pts">20 diem | 3 tieu chi</div>
-<p>D3.1 Seasonal (max 10): tu dong tinh theo lich mua vu va thang hien tai. Da tru lag time 2-3 thang.<br>D3.2 Budget cycle (max 5): <span style="color:var(--red)">BD can tu input</span> — khach dang o giai doan nao cua chu ky ngan sach.<br>D3.3 Campaign da biet (max 5): <span style="color:var(--red)">BD can tu input</span> — co biet khach co campaign sap toi khong.</p>
-</div>
-<div class="dim-ex-card">
-<h4>D4. Cau truc Mua hang</h4><div class="pts">15 diem | 3 tieu chi</div>
-<p>D4.1 Toc do QD (max 6): tu Tier/Size va BU. SME = 6d (quyet nhanh), MNC = 2d (nhieu tang duyet).<br>D4.2 Champion (max 5): tu Job Title trong Contacts. Director/CEO = 5d, Manager = 3d.<br>D4.3 Procurement (max 4): <span style="color:var(--red)">BD can tu input</span> — quy trinh dau thau nhu nao.</p>
-</div>
-<div class="dim-ex-card">
-<h4>D5. Nang luc Trien khai</h4><div class="pts">10 diem | 3 tieu chi</div>
-<p>D5.1 CoE capacity (max 5): tu Control Dashboard — trung tam chuyen mon con bandwidth khong.<br>D5.2 Timeline (max 3): khach muon kick-off khop nguon luc PMAX khong.<br>D5.3 Team level (max 2): deal can senior hay mid team.<br><span style="color:var(--red)">Hien dat = 0 (cho data Control Dashboard).</span></p>
-</div>
-<div class="dim-ex-card">
-<h4>D6. Lich su Quan he</h4><div class="pts">10 diem | 3 tieu chi</div>
-<p>D6.1 Quan he cu (max 4): tu lifecycle stage. Execution/Completed = 4d (khach cu tot).<br>D6.2 Referral (max 4): tu Source. Referral = 4d, Relationship = 2d, Cold = 0d.<br>D6.3 Vi the canh tranh (max 2): <span style="color:var(--red)">BD can tu input</span> — khach dang co agency chua.</p>
-</div>
-</div>
-
-<p style="margin-top:12px;font-weight:600;color:var(--blue)">Lop 2: Activity Score</p>
-<div class="dim-explain">
-<div class="dim-ex-card">
-<h4>A1. Pipeline Progression</h4><div class="pts">35 diem</div>
-<p>Tu PMAX lifecycle stage. Contact = 3d, Lead = 5d, Qualified Lead = 10d, Brief = 15d, Qualified Brief = 20d, Quotation Sent = 25d, Verbal = 30d, Contract/Execution = 35d.</p>
-</div>
-<div class="dim-ex-card">
-<h4>A2. Cuong do Tuong tac</h4><div class="pts">30 diem</div>
-<p>A2a So lan lien he (max 15): 16+ = 15d, 6-15 = 10d, 1-5 = 5d.<br>A2b Kenh + Recency (max 15): co Email = 5d, co Meeting = 5d, hoat dong gan nhat trong 30 ngay = 5d.</p>
-</div>
-<div class="dim-ex-card">
-<h4>A3. ICP Fit</h4><div class="pts">20 diem</div>
-<p>Nganh trong tam (max 10): Finance/Beauty/HC/FMCG/Home/Edu = 10d.<br>Quy mo (max 5): VIP/Important = 5d, Medium = 3d.<br>Vi tri (max 5): HCM = 5d, HN = 3d.</p>
-</div>
-<div class="dim-ex-card">
-<h4>A4. Momentum & Recency</h4><div class="pts">15 diem</div>
-<p>Source dang Active (max 5). Co deal dang mo (max 5). Milestone gan nhat trong 30 ngay (max 5).</p>
-</div>
-</div>
+<p>Khi kết hợp 2 lớp, ta thấy được: Opportunity cao + Activity thấp = "vàng chưa đào" (cần kích hoạt ngay). Opportunity thấp + Activity cao = "đang lãng phí effort" (cần đánh giá lại).</p>
 </div>
 
 <div class="guide-section">
-<h3>Lich mua vu — Cua so Pitching cho BD</h3>
-<p style="margin-bottom:8px">Bang duoi hien thi thoi diem BD nen tiep can, da tru lag time 2-3 thang so voi mua tieu dung. Vi du: may lanh ban chay T4-T5 &rarr; brand chay QC tu T3 &rarr; BD can pitch tu T1-T2.</p>
+<h3>Giải thích từng Dimension</h3>
+<p style="margin-bottom:12px;font-weight:600;color:var(--cyan)">Lớp 1: Opportunity Score</p>
+<div class="dim-explain">
+<div class="dim-ex-card">
+<h4>D1. Tiềm năng Doanh thu</h4><div class="pts">25 điểm | 3 tiêu chí</div>
+<p>D1.1 Quy mô deal (max 10): từ deal data trên HubSpot, chia theo ngưỡng 500tr/300tr/100tr mỗi tháng.<br>D1.2 Tỷ suất GP2 (max 8): từ Est. GP2 / Deal Amount. Trên 25% = 8đ, 15-25% = 5đ.<br>D1.3 CLV (max 7): xu hướng doanh thu khách cũ — <span style="color:var(--red)">hiện thiếu data</span>, cần file Finance.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D2. Độ phù hợp Sản phẩm</h4><div class="pts">20 điểm | 3 tiêu chí</div>
+<p>D2.1 SP chính khớp (max 10): từ Group Product trên HubSpot. Media Performance/Branding = 10đ (core PMAX 66% GP2).<br>D2.2 Bán chéo (max 5): tự động mapping theo vertical. Beauty/FMCG/Home = 5đ (nhiều SP có thể bán).<br>D2.3 Chiến lược (max 5): tự động mapping theo ma trận Ansoff. Ngành trọng tâm = 5đ.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D3. Thời điểm Mùa vụ</h4><div class="pts">20 điểm | 3 tiêu chí</div>
+<p>D3.1 Seasonal (max 10): tự động tính theo lịch mùa vụ và tháng hiện tại. Đã trừ lag time 2-3 tháng.<br>D3.2 Budget cycle (max 5): <span style="color:var(--red)">BD cần tự input</span> — khách đang ở giai đoạn nào của chu kỳ ngân sách.<br>D3.3 Campaign da biet (max 5): <span style="color:var(--red)">BD cần tự input</span> — có biết khách có campaign sắp tới không.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D4. Cấu trúc Mua hàng</h4><div class="pts">15 điểm | 3 tiêu chí</div>
+<p>D4.1 Tốc độ QĐ (max 6): từ Tier/Size và BU. SME = 6đ (quyết nhanh), MNC = 2đ (nhiều tầng duyệt).<br>D4.2 Champion (max 5): từ Job Title trong Contacts. Director/CEO = 5đ, Manager = 3đ.<br>D4.3 Procurement (max 4): <span style="color:var(--red)">BD cần tự input</span> — quy trình đấu thầu như nào.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D5. Năng lực Triển khai</h4><div class="pts">10 điểm | 3 tiêu chí</div>
+<p>D5.1 CoE capacity (max 5): từ Control Dashboard — trung tâm chuyên môn còn bandwidth không.<br>D5.2 Timeline (max 3): khách muốn kick-off khớp nguồn lực PMAX không.<br>D5.3 Team level (max 2): deal cần senior hay mid team.<br><span style="color:var(--red)">Hiện đặt = 0 (chờ data Control Dashboard).</span></p>
+</div>
+<div class="dim-ex-card">
+<h4>D6. Lịch sử Quan hệ</h4><div class="pts">10 điểm | 3 tiêu chí</div>
+<p>D6.1 Quan hệ cũ (max 4): từ lifecycle stage. Execution/Completed = 4đ (khách cũ tốt).<br>D6.2 Referral (max 4): từ Source. Referral = 4đ, Relationship = 2đ, Cold = 0đ.<br>D6.3 Vị thế cạnh tranh (max 2): <span style="color:var(--red)">BD cần tự input</span> — khách đang có agency chưa.</p>
+</div>
+</div>
+
+<p style="margin-top:12px;font-weight:600;color:var(--blue)">Lớp 2: Activity Score</p>
+<div class="dim-explain">
+<div class="dim-ex-card">
+<h4>A1. Pipeline Progression</h4><div class="pts">35 điểm</div>
+<p>Từ PMAX lifecycle stage. Contact = 3đ, Lead = 5đ, Qualified Lead = 10đ, Brief = 15đ, Qualified Brief = 20đ, Quotation Sent = 25đ, Verbal = 30đ, Contract/Execution = 35đ.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A2. Cuong do Tuong tac</h4><div class="pts">30 điểm</div>
+<p>A2a Số lần liên hệ (max 15): 16+ = 15đ, 6-15 = 10đ, 1-5 = 5đ.<br>A2b Kênh + Recency (max 15): có Email = 5đ, có Meeting = 5đ, hoạt động gần nhất trong 30 ngày = 5đ.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A3. ICP Fit</h4><div class="pts">20 điểm</div>
+<p>Ngành trọng tâm (max 10): Finance/Beauty/HC/FMCG/Home/Edu = 10đ.<br>Quy mô (max 5): VIP/Important = 5đ, Medium = 3đ.<br>Vị trí (max 5): HCM = 5đ, HN = 3đ.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A4. Momentum & Recency</h4><div class="pts">15 điểm</div>
+<p>Source đang Active (max 5). Có deal đang mở (max 5). Milestone gần nhất trong 30 ngày (max 5).</p>
+</div>
+</div>
+</div>
+
+<div class="guide-section">
+<h3>Lịch mùa vụ — Cửa sổ Pitching cho BD</h3>
+<p style="margin-bottom:8px">Bảng dưới hiển thị thời điểm BD nên tiếp cận, đã trừ lag time 2-3 tháng so với mùa tiêu dùng. Ví dụ: máy lạnh bán chạy T4-T5 &rarr; brand chạy QC từ T3 &rarr; BD cần pitch từ T1-T2.</p>
 <table class="seasonal-tbl">
-<tr><th>Nganh</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>T8</th><th>T9</th><th>T10</th><th>T11</th><th>T12</th></tr>
-<tr><td>Tai chinh</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
-<tr><td>Lam dep</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
-<tr><td>Y te</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+<tr><th>Ngành</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>T8</th><th>T9</th><th>T10</th><th>T11</th><th>T12</th></tr>
+<tr><td>Tài chính</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Làm đẹp</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Y tế</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td></tr>
 <tr><td>FMCG</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
-<tr><td>Gia dung & DT</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
-<tr><td>Giao duc</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td></tr>
-<tr><td>Am thuc (F&B)</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
-<tr><td>O to</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
-<tr><td>Bat dong san</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+<tr><td>Gia dụng & ĐT</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Giáo dục</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td></tr>
+<tr><td>Ẩm thực (F&B)</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Ô tô</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+<tr><td>Bất động sản</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
 </table>
-<p style="font-size:11px;color:var(--txm)">PITCH = cua so ly tuong de tiep can (10d) | Cb = chuan bi (5d) | QC = brand dang chay quang cao, da muon (2d) | - = mua thap (2d). Luu y: bang nay dua tren kien thuc tong quat, can hieu chinh bang du lieu brief/contract lich su cua PMAX.</p>
+<p style="font-size:11px;color:var(--txm)">PITCH = cửa sổ lý tưởng để tiếp cận (10đ) | Cb = chuẩn bị (5đ) | QC = brand đang chạy quảng cáo, đã muộn (2đ) | - = mùa thấp (2đ). Lưu ý: bảng này dựa trên kiến thức tổng quát, cần hiệu chỉnh bằng dữ liệu brief/contract lịch sử của PMAX.</p>
 </div>
 
 <div class="guide-section">
-<h3>Scoring nay tra loi duoc cau hoi nao?</h3>
+<h3>Scoring này trả lời được câu hỏi nào?</h3>
 <div class="qa-grid">
-<div class="qa-card"><div class="q">Cong ty nao nen uu tien trong quy nay?</div><div class="a">Loc tier A-Hot + B-Warm ket hop bo loc "Can day trong quy nay" &rarr; danh sach uu tien.</div></div>
-<div class="qa-card"><div class="q">Dang lang phi effort o dau?</div><div class="a">Tim cong ty co Activity cao nhung Opportunity thap (OPP duoi 50, ACT tren 60) &rarr; can danh gia lai.</div></div>
-<div class="qa-card"><div class="q">Co hoi nao dang bo lo?</div><div class="a">Tim cong ty co OPP cao nhung ACT thap &rarr; "vang chua dao", can phan bo BD ngay.</div></div>
-<div class="qa-card"><div class="q">Team BD nen phan bo effort nhu nao?</div><div class="a">Loc theo Owner &rarr; xem moi BD dang phu trach bao nhieu A-Hot va recommendation la gi.</div></div>
-<div class="qa-card"><div class="q">Nganh nao dang la co hoi lon nhat?</div><div class="a">Loc theo nganh &rarr; xem so luong A-Hot/B-Warm, ket hop voi lich mua vu de biet timing.</div></div>
-<div class="qa-card"><div class="q">Khi nao nen tiep can khach nganh X?</div><div class="a">Xem tab lich mua vu &rarr; thang nao la PITCH window cho nganh do.</div></div>
+<div class="qa-card"><div class="q">Công ty nào nên ưu tiên trong quý này?</div><div class="a">Loc tier A-Hot + B-Warm ket hop bo loc "Cần đẩy trong quý này" &rarr; danh sách ưu tiên.</div></div>
+<div class="qa-card"><div class="q">Đang lãng phí effort ở đâu?</div><div class="a">Tìm công ty có Activity cao nhưng Opportunity thấp (OPP dưới 50, ACT trên 60) &rarr; cần đánh giá lại.</div></div>
+<div class="qa-card"><div class="q">Cơ hội nào đang bỏ lỡ?</div><div class="a">Tìm công ty có OPP cao nhưng ACT thấp &rarr; "vàng chưa đào", cần phân bổ BD ngay.</div></div>
+<div class="qa-card"><div class="q">Team BD nên phân bổ effort như nào?</div><div class="a">Lọc theo Owner &rarr; xem mỗi BD đang phụ trách bao nhiêu A-Hot và recommendation là gì.</div></div>
+<div class="qa-card"><div class="q">Ngành nào đang là cơ hội lớn nhất?</div><div class="a">Lọc theo ngành &rarr; xem số lượng A-Hot/B-Warm, kết hợp với lịch mùa vụ để biết timing.</div></div>
+<div class="qa-card"><div class="q">Khi nào nên tiếp cận khách ngành X?</div><div class="a">Xem tab lịch mùa vụ &rarr; tháng nào là PITCH window cho ngành đó.</div></div>
 </div>
 </div>
 
 <div class="guide-section">
-<h3>Level nao can quan tam, khia canh nao?</h3>
+<h3>Level nào cần quan tâm, khía cạnh nào?</h3>
 <div class="level-grid">
 <div class="level-row">
 <span class="level-tag cxo">BDM / Head of Growth</span>
-<div class="level-info"><h4>Nhin tong the danh muc va phan bo nguon luc</h4>
-<p>Quan tam: phan bo tier (bao nhieu A-Hot/B-Warm), hieu qua tung BD (ai dang hold nhieu A-Hot), cac deal can escalate (A-Hot nhung bi stuck), va xu huong theo nganh/mua vu de dieu chinh chien luoc.</p></div>
+<div class="level-info"><h4>Nhìn tổng thể danh mục và phân bổ nguồn lực</h4>
+<p>Quan tâm: phân bổ tier (bao nhiêu A-Hot/B-Warm), hiệu quả từng BD (ai đang hold nhiều A-Hot), các deal cần escalate (A-Hot nhưng bị stuck), và xu hướng theo ngành/mùa vụ để điều chỉnh chiến lược.</p></div>
 </div>
 <div class="level-row">
 <span class="level-tag mgr">BD Lead / Team Lead</span>
-<div class="level-info"><h4>Quan ly pipeline va dieu phoi hanh dong hang tuan</h4>
-<p>Quan tam: recommendation cua tung cong ty (ai can push chot, ai can follow up), bo loc "Can day trong quy nay" de len weekly action plan, theo doi chuyen doi tu B-Warm len A-Hot, va phat hien cong ty bi rot tier.</p></div>
+<div class="level-info"><h4>Quản lý pipeline và điều phối hành động hàng tuần</h4>
+<p>Quan tâm: recommendation của từng công ty (ai cần push chốt, ai cần follow up), bộ lọc "Cần đẩy trong quý này" để lên weekly action plan, theo dõi chuyển đổi từ B-Warm lên A-Hot, và phát hiện công ty bị rớt tier.</p></div>
 </div>
 <div class="level-row">
-<span class="level-tag bd">BD Rep (Ngoc, Dai, Phuong, Thao, My)</span>
-<div class="level-info"><h4>Biet chinh xac hom nay can lam gi voi ai</h4>
-<p>Quan tam: loc theo ten minh &rarr; xem danh sach cong ty phu trach sap theo uu tien. Recommendation cho biet hanh dong cu the. Click vao cong ty de xem diem thanh phan — biet diem nao thieu de bo sung (VD: D4.2 Champion = 1 &rarr; can tim nguoi lien he cap cao hon).</p></div>
+<span class="level-tag bd">BD Rep (Ngọc, Đại, Phương, Thảo, My)</span>
+<div class="level-info"><h4>Biết chính xác hôm nay cần làm gì với ai</h4>
+<p>Quan tâm: lọc theo tên mình &rarr; xem danh sách công ty phụ trách sắp theo ưu tiên. Recommendation cho biết hành động cụ thể. Click vào công ty để xem điểm thành phần — biết điểm nào thiếu để bổ sung (VD: D4.2 Champion = 1 &rarr; cần tìm người liên hệ cấp cao hơn).</p></div>
 </div>
 </div>
 </div>
@@ -361,7 +361,7 @@ function render(){
   const tiers={'A-Hot':0,'B-Warm':0,'C-Nurt':0,'D-Cold':0};f.forEach(d=>tiers[d.tier]++);
   const cls={'A-Hot':'hot','B-Warm':'warm','C-Nurt':'nurt','D-Cold':'cold'};
   document.getElementById('stats').innerHTML=Object.entries(tiers).map(([t,n])=>`<div class="stat ${cls[t]}"><div class="n">${n}</div><div class="l">${t}</div></div>`).join('');
-  document.getElementById('countTag').textContent=f.length+' cong ty';
+  document.getElementById('countTag').textContent=f.length+' công ty';
   document.getElementById('tbody').innerHTML=f.map(d=>{
     const tc='tier-'+d.tier[0];
     return `<tr class="main-row" onclick="toggleRow(${d.rank})">
@@ -378,7 +378,7 @@ function render(){
 </tr>
 <tr class="expand-row" id="exp-${d.rank}"><td colspan="37">
 <div class="detail-grid">
-<div class="detail-box"><h4>D1. Tiem nang Doanh thu (max 25)</h4>
+<div class="detail-box"><h4>D1. Tiềm năng Doanh thu (max 25)</h4>
 <div class="detail-item"><span class="lbl">D1.1 Quy mo deal (max 10)</span>${dv(d.d11,10)}</div>
 <div class="detail-item"><span class="lbl">D1.2 Ty suat GP2% (max 8)</span>${dv(d.d12,8)}</div>
 <div class="detail-item"><span class="lbl">D1.3 Xu huong CLV (max 7)</span>${dv(d.d13,7)}</div></div>
@@ -386,22 +386,22 @@ function render(){
 <div class="detail-item"><span class="lbl">D2.1 SP chinh khop (max 10)</span>${dv(d.d21,10)}</div>
 <div class="detail-item"><span class="lbl">D2.2 Tiem nang ban cheo (max 5)</span>${dv(d.d22,5)}</div>
 <div class="detail-item"><span class="lbl">D2.3 Chien luoc Ansoff (max 5)</span>${dv(d.d23,5)}</div></div>
-<div class="detail-box"><h4>D3. Thoi diem Mua vu (max 20)</h4>
+<div class="detail-box"><h4>D3. Thời điểm Mùa vụ (max 20)</h4>
 <div class="detail-item"><span class="lbl">D3.1 Cua so pitch (max 10)</span>${dv(d.d31,10)}</div>
 <div class="detail-item"><span class="lbl">D3.2 Chu ky ngan sach (max 5)</span>${dv(d.d32,5)}</div>
 <div class="detail-item"><span class="lbl">D3.3 Campaign da biet (max 5)</span>${dv(d.d33,5)}</div></div>
-<div class="detail-box"><h4>D4. Cau truc Mua hang (max 15)</h4>
+<div class="detail-box"><h4>D4. Cấu trúc Mua hàng (max 15)</h4>
 <div class="detail-item"><span class="lbl">D4.1 Toc do quyet dinh (max 6)</span>${dv(d.d41,6)}</div>
 <div class="detail-item"><span class="lbl">D4.2 Cap lien he (max 5)</span>${dv(d.d42,5)}</div>
 <div class="detail-item"><span class="lbl">D4.3 Quy trinh mua (max 4)</span>${dv(d.d43,4)}</div></div>
-<div class="detail-box"><h4>D5. Nang luc Trien khai (max 10)</h4>
+<div class="detail-box"><h4>D5. Năng lực Triển khai (max 10)</h4>
 <div class="detail-item"><span class="lbl">D5.1 CoE capacity (max 5)</span>${dv(d.d51,5)}</div>
 <div class="detail-item"><span class="lbl">D5.2 Timeline (max 3)</span>${dv(d.d52,3)}</div>
 <div class="detail-item"><span class="lbl">D5.3 Team level (max 2)</span>${dv(d.d53,2)}</div></div>
-<div class="detail-box"><h4>D6. Lich su Quan he (max 10)</h4>
+<div class="detail-box"><h4>D6. Lịch sử Quan hệ (max 10)</h4>
 <div class="detail-item"><span class="lbl">D6.1 Quan he cu (max 4)</span>${dv(d.d61,4)}</div>
 <div class="detail-item"><span class="lbl">D6.2 Referral (max 4)</span>${dv(d.d62,4)}</div>
-<div class="detail-item"><span class="lbl">D6.3 Vi the canh tranh (max 2)</span>${dv(d.d63,2)}</div></div>
+<div class="detail-item"><span class="lbl">D6.3 Vị thế cạnh tranh (max 2)</span>${dv(d.d63,2)}</div></div>
 </div>
 <div class="detail-grid" style="margin-top:10px">
 <div class="detail-box"><h4>A1. Pipeline (max 35)</h4>
