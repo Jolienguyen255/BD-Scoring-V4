@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMAX BD Scoring V2 — Top 100 Companies</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080d;--s1:#10101a;--s2:#161622;--s3:#1e1e2c;--bd:#252538;--tx:#e0e0ec;--txd:#8080a0;--txm:#505068;--hot:#ff6b35;--warm:#ffc233;--nurt:#4a90d9;--cold:#606078;--cyan:#00d4aa;--blue:#4a7aff;--red:#ff4a6a;--grn:#2ecc71;--pur:#9a6aff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:100%;margin:0 auto;padding:20px 16px 80px}
+
+/* TABS */
+.tabs-nav{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--bd)}
+.tab-btn{padding:12px 24px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--txd);cursor:pointer;transition:all .15s}
+.tab-btn:hover{color:var(--tx)}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.tab-content{display:none;padding-top:24px}
+.tab-content.active{display:block}
+
+/* HEADER */
+.hdr{text-align:center;padding:32px 0 20px;border-bottom:1px solid var(--bd);margin-bottom:24px}
+.hdr-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+.hdr h1{font-size:24px;font-weight:700;margin-bottom:6px}
+.hdr p{font-size:12px;color:var(--txd);max-width:620px;margin:0 auto}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px 12px;text-align:center}
+.stat .n{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;margin-bottom:2px}
+.stat .l{font-size:10px;color:var(--txd);text-transform:uppercase;letter-spacing:1px}
+.stat.hot .n{color:var(--hot)}.stat.warm .n{color:var(--warm)}.stat.nurt .n{color:var(--nurt)}.stat.cold .n{color:var(--cold)}
+
+/* FILTERS */
+.filter-section{margin-bottom:16px}
+.filter-label{font-size:10px;color:var(--txm);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.btn{padding:5px 12px;font-size:11px;font-family:'DM Sans',sans-serif;border:1px solid var(--bd);border-radius:5px;background:transparent;color:var(--txd);cursor:pointer;transition:all .12s}
+.btn:hover{border-color:var(--cyan);color:var(--tx)}
+.btn.on{background:rgba(0,212,170,.12);border-color:var(--cyan);color:var(--cyan)}
+.btn.on-push{background:rgba(255,74,106,.1);border-color:var(--red);color:var(--red)}
+.btn.on-warm{background:rgba(255,194,51,.1);border-color:var(--warm);color:var(--warm)}
+.search{width:260px;padding:7px 12px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--s1);border:1px solid var(--bd);border-radius:5px;color:var(--tx);outline:none}
+.search:focus{border-color:var(--cyan)}
+.search::placeholder{color:var(--txm)}
+.count-tag{font-family:'DM Mono',monospace;font-size:11px;color:var(--txd);margin-left:8px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:8px;background:var(--s1)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{position:sticky;top:0;z-index:2;background:var(--s2);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.4px;text-transform:uppercase;color:var(--txd);padding:8px 5px;text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+thead th.left{text-align:left}
+thead th.g-d1{background:#1a2a18;color:#70c070}
+thead th.g-d2{background:#0d2a22;color:#50c0a0}
+thead th.g-d3{background:#2a2210;color:#c0a050}
+thead th.g-d4{background:#201a28;color:#a080c0}
+thead th.g-d5{background:#2a2818;color:#c0b060}
+thead th.g-d6{background:#2a1820;color:#c06080}
+thead th.g-a{background:#0d1a30;color:var(--blue)}
+thead th.g-opp{background:#0d2a15;color:var(--cyan)}
+thead th.g-act{background:#101a35;color:var(--blue)}
+thead th.g-tot{background:#1a1a10;color:var(--tx)}
+tbody tr.main-row{border-bottom:1px solid rgba(37,37,56,.4);transition:background .1s;cursor:pointer}
+tbody tr.main-row:hover{background:rgba(0,212,170,.03)}
+td{padding:6px 5px;text-align:center;vertical-align:middle;white-space:nowrap}
+td.left{text-align:left}
+td.company{font-weight:600;font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
+
+/* EXPAND ROW */
+tr.expand-row{display:none;border-bottom:1px solid var(--bd)}
+tr.expand-row.open{display:table-row}
+tr.expand-row td{padding:16px 12px;background:var(--s2);text-align:left}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.detail-box{background:var(--s3);border-radius:7px;padding:12px 14px}
+.detail-box h4{font-size:10px;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:500}
+.detail-item{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
+.detail-item .lbl{color:var(--txd)}
+.detail-item .val{font-family:'DM Mono',monospace;font-size:11px}
+.val-hi{color:var(--cyan)}.val-mid{color:var(--txd)}.val-lo{color:rgba(255,74,106,.7)}.val-na{color:var(--txm)}.val-zero{color:var(--txm)}
+
+/* BADGES */
+.tier-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;font-weight:600}
+.tier-A{background:rgba(255,107,53,.15);color:var(--hot);border:1px solid rgba(255,107,53,.25)}
+.tier-B{background:rgba(255,194,51,.12);color:var(--warm);border:1px solid rgba(255,194,51,.25)}
+.tier-C{background:rgba(74,144,217,.1);color:var(--nurt);border:1px solid rgba(74,144,217,.2)}
+.tier-D{background:rgba(96,96,120,.12);color:var(--cold);border:1px solid rgba(96,96,120,.2)}
+.rec{font-size:10px;max-width:170px;white-space:normal;line-height:1.3;text-align:left}
+.rec-push{color:var(--red)}.rec-pitch{color:var(--cyan)}.rec-follow{color:var(--warm)}.rec-delivery{color:var(--blue)}.rec-done{color:var(--txm)}
+.sc{font-family:'DM Mono',monospace;font-size:10px}
+.sc-opp{color:var(--cyan);font-weight:600}.sc-act{color:var(--blue);font-weight:600}
+.sc-total{font-family:'DM Mono',monospace;font-weight:700;font-size:12px;color:var(--tx)}
+.d{font-family:'DM Mono',monospace;font-size:10px;color:var(--txd)}
+.d-na{color:var(--txm);font-size:9px}
+.d-hi{color:var(--cyan)}.d-lo{color:rgba(255,74,106,.7)}.d-zero{color:var(--txm)}
+.vert-tag{font-size:9px;padding:1px 5px;border-radius:3px;display:inline-block;white-space:nowrap}
+.v-fin{background:rgba(74,122,255,.1);color:#6a9aff}
+.v-bea{background:rgba(255,107,160,.08);color:#ff6ba0}
+.v-hc{background:rgba(0,212,170,.08);color:var(--cyan)}
+.v-fmcg{background:rgba(255,194,51,.08);color:var(--warm)}
+.v-he{background:rgba(154,106,255,.08);color:var(--pur)}
+.v-edu{background:rgba(46,204,113,.08);color:var(--grn)}
+.v-auto{background:rgba(255,107,53,.08);color:var(--hot)}
+.v-re{background:rgba(96,96,120,.1);color:#a0a0b8}
+.v-oth{background:rgba(96,96,120,.08);color:var(--cold)}
+.stg{font-size:9px;color:var(--txd);max-width:100px;overflow:hidden;text-overflow:ellipsis}
+.owner{font-size:10px;color:var(--txd)}
+
+/* GUIDE TAB */
+.guide{max-width:860px;margin:0 auto}
+.guide-section{margin-bottom:40px}
+.guide-section h2{font-size:20px;font-weight:700;margin-bottom:6px}
+.guide-section h3{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--cyan)}
+.guide-section p,.guide-section li{font-size:13px;color:var(--txd);line-height:1.7}
+.guide-section ul{list-style:none;padding:0}
+.guide-section li{padding:6px 0;padding-left:16px;position:relative}
+.guide-section li::before{content:"";position:absolute;left:0;top:13px;width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+.guide-card{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:20px;margin:12px 0}
+.guide-card h4{font-size:13px;font-weight:600;margin-bottom:4px}
+.guide-card p{font-size:12px;color:var(--txd)}
+.dim-explain{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.dim-ex-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.dim-ex-card h4{font-size:12px;font-weight:600;margin-bottom:2px}
+.dim-ex-card .pts{font-family:'DM Mono',monospace;font-size:11px;color:var(--cyan);margin-bottom:6px}
+.dim-ex-card p{font-size:11px;color:var(--txd)}
+.seasonal-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:16px 0}
+.seasonal-tbl th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--txd);padding:8px 4px;text-align:center;border-bottom:1px solid var(--bd)}
+.seasonal-tbl th:first-child{text-align:left;width:130px}
+.seasonal-tbl td{padding:6px 4px;text-align:center;border-bottom:1px solid rgba(37,37,56,.3);font-size:10px}
+.seasonal-tbl td:first-child{text-align:left;font-weight:500;font-size:11px}
+.s-p{background:rgba(255,74,106,.12);color:var(--red);border-radius:3px;font-weight:600}
+.s-w{background:rgba(255,194,51,.08);color:var(--warm);border-radius:3px}
+.s-l{color:var(--txm)}
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.qa-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.qa-card .q{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--tx)}
+.qa-card .a{font-size:11px;color:var(--txd)}
+.level-grid{margin:16px 0}
+.level-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(37,37,56,.3)}
+.level-tag{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:4px;white-space:nowrap;height:fit-content}
+.level-tag.cxo{background:rgba(154,106,255,.12);color:var(--pur);border:1px solid rgba(154,106,255,.2)}
+.level-tag.mgr{background:rgba(0,212,170,.1);color:var(--cyan);border:1px solid rgba(0,212,170,.2)}
+.level-tag.bd{background:rgba(74,122,255,.1);color:var(--blue);border:1px solid rgba(74,122,255,.2)}
+.level-info{flex:1}
+.level-info h4{font-size:12px;font-weight:600;margin-bottom:2px}
+.level-info p{font-size:11px;color:var(--txd)}
+
+@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.search{width:100%}.dim-explain,.qa-grid{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hdr">
+<div class="hdr-tag">PMAX BD Operating System</div>
+<h1>BD Scoring V2 — Top 100 Companies</h1>
+<p>941 cong ty da cham diem theo 2 lop (Opportunity + Activity). Data tu HubSpot + Client Activities Master.</p>
+</div>
+
+<div class="tabs-nav">
+<button class="tab-btn active" onclick="switchTab('scoring',this)">Scoring</button>
+<button class="tab-btn" onclick="switchTab('guide',this)">Huong dan & Giai thich</button>
+</div>
+
+<!-- ==================== TAB 1: SCORING ==================== -->
+<div class="tab-content active" id="tab-scoring">
+<div class="stats" id="stats"></div>
+<div class="filter-section">
+<div class="filter-label">Phan loai Tier</div>
+<div class="filter-row">
+<button class="btn on" data-tier="all" onclick="setTier('all',this)">Tat ca</button>
+<button class="btn" data-tier="A-Hot" onclick="setTier('A-Hot',this)">A-Hot</button>
+<button class="btn" data-tier="B-Warm" onclick="setTier('B-Warm',this)">B-Warm</button>
+<button class="btn" data-tier="C-Nurt" onclick="setTier('C-Nurt',this)">C-Nurt</button>
+<button class="btn" data-tier="D-Cold" onclick="setTier('D-Cold',this)">D-Cold</button>
+<span class="count-tag" id="countTag"></span>
+</div>
+<div class="filter-label">Hanh dong uu tien</div>
+<div class="filter-row">
+<button class="btn on" data-act="all" onclick="setAction('all',this)">Tat ca</button>
+<button class="btn" data-act="q-now" onclick="setAction('q-now',this)">Can day trong quy nay</button>
+<button class="btn" data-act="q-next" onclick="setAction('q-next',this)">Follow up quy ke</button>
+<button class="btn" data-act="delivery" onclick="setAction('delivery',this)">Dang trien khai</button>
+<input class="search" id="search" placeholder="Tim kiem cong ty, nganh, owner...">
+</div>
+</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr>
+<th>#</th><th class="left" style="min-width:180px">Cong ty</th><th>Nganh</th><th>Owner</th><th>Stage</th><th>Tier</th>
+<th class="g-d1">D1.1</th><th class="g-d1">D1.2</th><th class="g-d1">D1.3</th>
+<th class="g-d2">D2.1</th><th class="g-d2">D2.2</th><th class="g-d2">D2.3</th>
+<th class="g-d3">D3.1</th><th class="g-d3">D3.2</th><th class="g-d3">D3.3</th>
+<th class="g-d4">D4.1</th><th class="g-d4">D4.2</th><th class="g-d4">D4.3</th>
+<th class="g-d5">D5.1</th><th class="g-d5">D5.2</th><th class="g-d5">D5.3</th>
+<th class="g-d6">D6.1</th><th class="g-d6">D6.2</th><th class="g-d6">D6.3</th>
+<th class="g-opp">OPP</th>
+<th class="g-a">A1</th><th class="g-a">A2a</th><th class="g-a">A2b</th><th class="g-a">A3i</th><th class="g-a">A3s</th><th class="g-a">A3l</th><th class="g-a">A4s</th><th class="g-a">A4d</th><th class="g-a">A4m</th>
+<th class="g-act">ACT</th><th class="g-tot">Tong</th><th style="min-width:140px">Recommendation</th>
+</tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- ==================== TAB 2: GUIDE ==================== -->
+<div class="tab-content" id="tab-guide">
+<div class="guide">
+
+<div class="guide-section">
+<h2>Scoring Framework V2 la gi?</h2>
+<p>Day la he thong cham diem 2 lop, duoc thiet ke de tra loi cau hoi cot loi cua team BD: <strong style="color:var(--tx)">"Trong 941 cong ty, cong ty nao nen danh, bang gi, vao luc nao, va ai nen lam?"</strong></p>
+<p style="margin-top:8px">He thong cham diem cu chi co 1 lop (Activity Score) — do luong PMAX da tuong tac voi khach den dau. Van de la: mot cong ty co the co activity cao nhung co hoi thuc te thap (deal nho, ngoai nganh, mua sai thoi diem). Nguoc lai, mot cong ty co activity thap nhung la co hoi vang (deal lon, dung nganh, dang mua cao diem).</p>
+<p style="margin-top:8px">Scoring V2 bo sung them <strong style="color:var(--cyan)">Lop 1: Opportunity Score</strong> — danh gia khach quan cong ty co dang theo duoi khong, doc lap voi viec PMAX da lam gi.</p>
+</div>
+
+<div class="guide-section">
+<h3>Vi sao tach 2 layer?</h3>
+<div class="dim-explain">
+<div class="guide-card">
+<h4 style="color:var(--cyan)">Lop 1: Opportunity Score (toi da 100 diem)</h4>
+<p>Tra loi: "Cong ty nay co dang danh khong?"<br>6 chieu: Doanh thu, San pham, Mua vu, Cau truc mua, Trien khai, Quan he.<br>Data tu: HubSpot deals, vertical mapping, lich mua vu, contacts job title, source.</p>
+</div>
+<div class="guide-card">
+<h4 style="color:var(--blue)">Lop 2: Activity Score (toi da 100 diem)</h4>
+<p>Tra loi: "PMAX dang o dau voi cong ty nay?"<br>4 chieu: Pipeline stage, Cuong do tuong tac, ICP fit, Momentum.<br>Data tu: HubSpot lifecycle stage, Client Activities Master, company profile.</p>
+</div>
+</div>
+<p>Khi ket hop 2 lop, ta thay duoc: Opportunity cao + Activity thap = "vang chua dao" (can kich hoat ngay). Opportunity thap + Activity cao = "dang lang phi effort" (can danh gia lai).</p>
+</div>
+
+<div class="guide-section">
+<h3>Giai thich tung Dimension</h3>
+<p style="margin-bottom:12px;font-weight:600;color:var(--cyan)">Lop 1: Opportunity Score</p>
+<div class="dim-explain">
+<div class="dim-ex-card">
+<h4>D1. Tiem nang Doanh thu</h4><div class="pts">25 diem | 3 tieu chi</div>
+<p>D1.1 Quy mo deal (max 10): tu deal data tren HubSpot, chia theo nguong 500tr/300tr/100tr moi thang.<br>D1.2 Ty suat GP2 (max 8): tu Est. GP2 / Deal Amount. Tren 25% = 8d, 15-25% = 5d.<br>D1.3 CLV (max 7): xu huong doanh thu khach cu — <span style="color:var(--red)">hien thieu data</span>, can file Finance.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D2. Do phu hop San pham</h4><div class="pts">20 diem | 3 tieu chi</div>
+<p>D2.1 SP chinh khop (max 10): tu Group Product tren HubSpot. Media Performance/Branding = 10d (core PMAX 66% GP2).<br>D2.2 Ban cheo (max 5): tu dong mapping theo vertical. Beauty/FMCG/Home = 5d (nhieu SP co the ban).<br>D2.3 Chien luoc (max 5): tu dong mapping theo ma tran Ansoff. Nganh trong tam = 5d.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D3. Thoi diem Mua vu</h4><div class="pts">20 diem | 3 tieu chi</div>
+<p>D3.1 Seasonal (max 10): tu dong tinh theo lich mua vu va thang hien tai. Da tru lag time 2-3 thang.<br>D3.2 Budget cycle (max 5): <span style="color:var(--red)">BD can tu input</span> — khach dang o giai doan nao cua chu ky ngan sach.<br>D3.3 Campaign da biet (max 5): <span style="color:var(--red)">BD can tu input</span> — co biet khach co campaign sap toi khong.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D4. Cau truc Mua hang</h4><div class="pts">15 diem | 3 tieu chi</div>
+<p>D4.1 Toc do QD (max 6): tu Tier/Size va BU. SME = 6d (quyet nhanh), MNC = 2d (nhieu tang duyet).<br>D4.2 Champion (max 5): tu Job Title trong Contacts. Director/CEO = 5d, Manager = 3d.<br>D4.3 Procurement (max 4): <span style="color:var(--red)">BD can tu input</span> — quy trinh dau thau nhu nao.</p>
+</div>
+<div class="dim-ex-card">
+<h4>D5. Nang luc Trien khai</h4><div class="pts">10 diem | 3 tieu chi</div>
+<p>D5.1 CoE capacity (max 5): tu Control Dashboard — trung tam chuyen mon con bandwidth khong.<br>D5.2 Timeline (max 3): khach muon kick-off khop nguon luc PMAX khong.<br>D5.3 Team level (max 2): deal can senior hay mid team.<br><span style="color:var(--red)">Hien dat = 0 (cho data Control Dashboard).</span></p>
+</div>
+<div class="dim-ex-card">
+<h4>D6. Lich su Quan he</h4><div class="pts">10 diem | 3 tieu chi</div>
+<p>D6.1 Quan he cu (max 4): tu lifecycle stage. Execution/Completed = 4d (khach cu tot).<br>D6.2 Referral (max 4): tu Source. Referral = 4d, Relationship = 2d, Cold = 0d.<br>D6.3 Vi the canh tranh (max 2): <span style="color:var(--red)">BD can tu input</span> — khach dang co agency chua.</p>
+</div>
+</div>
+
+<p style="margin-top:12px;font-weight:600;color:var(--blue)">Lop 2: Activity Score</p>
+<div class="dim-explain">
+<div class="dim-ex-card">
+<h4>A1. Pipeline Progression</h4><div class="pts">35 diem</div>
+<p>Tu PMAX lifecycle stage. Contact = 3d, Lead = 5d, Qualified Lead = 10d, Brief = 15d, Qualified Brief = 20d, Quotation Sent = 25d, Verbal = 30d, Contract/Execution = 35d.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A2. Cuong do Tuong tac</h4><div class="pts">30 diem</div>
+<p>A2a So lan lien he (max 15): 16+ = 15d, 6-15 = 10d, 1-5 = 5d.<br>A2b Kenh + Recency (max 15): co Email = 5d, co Meeting = 5d, hoat dong gan nhat trong 30 ngay = 5d.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A3. ICP Fit</h4><div class="pts">20 diem</div>
+<p>Nganh trong tam (max 10): Finance/Beauty/HC/FMCG/Home/Edu = 10d.<br>Quy mo (max 5): VIP/Important = 5d, Medium = 3d.<br>Vi tri (max 5): HCM = 5d, HN = 3d.</p>
+</div>
+<div class="dim-ex-card">
+<h4>A4. Momentum & Recency</h4><div class="pts">15 diem</div>
+<p>Source dang Active (max 5). Co deal dang mo (max 5). Milestone gan nhat trong 30 ngay (max 5).</p>
+</div>
+</div>
+</div>
+
+<div class="guide-section">
+<h3>Lich mua vu — Cua so Pitching cho BD</h3>
+<p style="margin-bottom:8px">Bang duoi hien thi thoi diem BD nen tiep can, da tru lag time 2-3 thang so voi mua tieu dung. Vi du: may lanh ban chay T4-T5 &rarr; brand chay QC tu T3 &rarr; BD can pitch tu T1-T2.</p>
+<table class="seasonal-tbl">
+<tr><th>Nganh</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>T8</th><th>T9</th><th>T10</th><th>T11</th><th>T12</th></tr>
+<tr><td>Tai chinh</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Lam dep</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Y te</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+<tr><td>FMCG</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Gia dung & DT</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>Giao duc</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-w">Cb</td></tr>
+<tr><td>Am thuc (F&B)</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-w">Cb</td><td class="s-w">Cb</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-w">Cb</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td></tr>
+<tr><td>O to</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+<tr><td>Bat dong san</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td><td class="s-p">PITCH</td><td class="s-p">PITCH</td><td class="s-l">QC</td><td class="s-l">QC</td><td class="s-l">-</td><td class="s-l">-</td></tr>
+</table>
+<p style="font-size:11px;color:var(--txm)">PITCH = cua so ly tuong de tiep can (10d) | Cb = chuan bi (5d) | QC = brand dang chay quang cao, da muon (2d) | - = mua thap (2d). Luu y: bang nay dua tren kien thuc tong quat, can hieu chinh bang du lieu brief/contract lich su cua PMAX.</p>
+</div>
+
+<div class="guide-section">
+<h3>Scoring nay tra loi duoc cau hoi nao?</h3>
+<div class="qa-grid">
+<div class="qa-card"><div class="q">Cong ty nao nen uu tien trong quy nay?</div><div class="a">Loc tier A-Hot + B-Warm ket hop bo loc "Can day trong quy nay" &rarr; danh sach uu tien.</div></div>
+<div class="qa-card"><div class="q">Dang lang phi effort o dau?</div><div class="a">Tim cong ty co Activity cao nhung Opportunity thap (OPP duoi 50, ACT tren 60) &rarr; can danh gia lai.</div></div>
+<div class="qa-card"><div class="q">Co hoi nao dang bo lo?</div><div class="a">Tim cong ty co OPP cao nhung ACT thap &rarr; "vang chua dao", can phan bo BD ngay.</div></div>
+<div class="qa-card"><div class="q">Team BD nen phan bo effort nhu nao?</div><div class="a">Loc theo Owner &rarr; xem moi BD dang phu trach bao nhieu A-Hot va recommendation la gi.</div></div>
+<div class="qa-card"><div class="q">Nganh nao dang la co hoi lon nhat?</div><div class="a">Loc theo nganh &rarr; xem so luong A-Hot/B-Warm, ket hop voi lich mua vu de biet timing.</div></div>
+<div class="qa-card"><div class="q">Khi nao nen tiep can khach nganh X?</div><div class="a">Xem tab lich mua vu &rarr; thang nao la PITCH window cho nganh do.</div></div>
+</div>
+</div>
+
+<div class="guide-section">
+<h3>Level nao can quan tam, khia canh nao?</h3>
+<div class="level-grid">
+<div class="level-row">
+<span class="level-tag cxo">BDM / Head of Growth</span>
+<div class="level-info"><h4>Nhin tong the danh muc va phan bo nguon luc</h4>
+<p>Quan tam: phan bo tier (bao nhieu A-Hot/B-Warm), hieu qua tung BD (ai dang hold nhieu A-Hot), cac deal can escalate (A-Hot nhung bi stuck), va xu huong theo nganh/mua vu de dieu chinh chien luoc.</p></div>
+</div>
+<div class="level-row">
+<span class="level-tag mgr">BD Lead / Team Lead</span>
+<div class="level-info"><h4>Quan ly pipeline va dieu phoi hanh dong hang tuan</h4>
+<p>Quan tam: recommendation cua tung cong ty (ai can push chot, ai can follow up), bo loc "Can day trong quy nay" de len weekly action plan, theo doi chuyen doi tu B-Warm len A-Hot, va phat hien cong ty bi rot tier.</p></div>
+</div>
+<div class="level-row">
+<span class="level-tag bd">BD Rep (Ngoc, Dai, Phuong, Thao, My)</span>
+<div class="level-info"><h4>Biet chinh xac hom nay can lam gi voi ai</h4>
+<p>Quan tam: loc theo ten minh &rarr; xem danh sach cong ty phu trach sap theo uu tien. Recommendation cho biet hanh dong cu the. Click vao cong ty de xem diem thanh phan — biet diem nao thieu de bo sung (VD: D4.2 Champion = 1 &rarr; can tim nguoi lien he cap cao hon).</p></div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<script>
+const DATA = [{"rank": 1, "company": "CÔNG TY TNHH ILA VIỆT NAM", "vertical": "Education", "owner": "Đại", "lifecycle": "Contract/ Deposit", "opp": 68, "act": 88, "combined": 156, "tier": "A-Hot", "rec": "Follow up triển khai", "d11": 10, "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 35, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 2, "company": "CÔNG TY CỔ PHẦN CASPER SE", "vertical": "Home & Electronics", "owner": "My", "lifecycle": "Quotation Sent", "opp": 69, "act": 86, "combined": 155, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 3, "company": "CÔNG TY TNHH BIOCODEX VIỆT NAM", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Verbal Confirm", "opp": 59, "act": 93, "combined": 152, "tier": "A-Hot", "rec": "Push chốt hợp đồng trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 4, "company": "Bayer Crop Science", "vertical": "Health Care", "owner": "My", "lifecycle": "Execution", "opp": 73, "act": 78, "combined": 151, "tier": "A-Hot", "rec": "Theo dõi delivery quality", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 4, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 5, "company": "CÔNG TY TNHH ĐIỆN MÁY AQUA VIỆT NAM", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Quotation Sent", "opp": 73, "act": 76, "combined": 149, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 6, "company": "ĐH Hồng Bàng", "vertical": "Education", "owner": "Ngọc", "lifecycle": "Verbal Confirm", "opp": 69, "act": 76, "combined": 145, "tier": "A-Hot", "rec": "Push chốt hợp đồng trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 6, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 7, "company": "Genex - Fatz Baby", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Execution", "opp": 73, "act": 71, "combined": 144, "tier": "A-Hot", "rec": "Theo dõi delivery quality", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 3, "a4s": 2, "a4d": 5, "a4m": 0}, {"rank": 8, "company": "CÔNG TY CỔ PHẦN SỮA VIỆT NAM (VINAMILK)", "vertical": "FMCG", "owner": "My", "lifecycle": "Quotation Sent", "opp": 61, "act": 82, "combined": 143, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 2, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 10, "a2b": 15, "a3i": 10, "a3s": 5, "a3l": 5, "a4s": 2, "a4d": 5, "a4m": 5}, {"rank": 9, "company": "NGÂN HÀNG TMCP KỸ THƯƠNG VIỆT NAM", "vertical": "Finance", "owner": "Đại", "lifecycle": "Quotation Sent", "opp": 56, "act": 86, "combined": 142, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 25, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 10, "company": "CÔNG TY CP TẬP ĐOÀN SUNHOUSE", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Execution", "opp": 58, "act": 84, "combined": 142, "tier": "A-Hot", "rec": "Theo dõi delivery quality", "d11": 1, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 3, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 11, "company": "CÔNG TY TNHH CHEIL VIỆT NAM", "vertical": "Home & Electronics", "owner": "My", "lifecycle": "Quotation Sent", "opp": 64, "act": 78, "combined": 142, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 7, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 25, "a2a": 5, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 12, "company": "Gambol Thailand", "vertical": "FMCG", "owner": "My", "lifecycle": "Verbal Confirm", "opp": 68, "act": 73, "combined": 141, "tier": "A-Hot", "rec": "Push chốt hợp đồng trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 30, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 13, "company": "Golden_Comfee", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Quotation Sent", "opp": 75, "act": 63, "combined": 138, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": 10, "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 0, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 14, "company": "CÔNG TY TNHH DUNLOPILLO (VIỆT NAM)", "vertical": "Home & Electronics", "owner": "Thảo", "lifecycle": "Quotation Sent", "opp": 66, "act": 71, "combined": 137, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 15, "company": "Jetzt", "vertical": "Home & Electronics", "owner": "My", "lifecycle": "Qualified brief", "opp": 69, "act": 68, "combined": 137, "tier": "A-Hot", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 20, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 16, "company": "Paula's Choice", "vertical": "Beauty", "owner": "Đại", "lifecycle": "Contract/ Deposit", "opp": 64, "act": 73, "combined": 137, "tier": "A-Hot", "rec": "Follow up triển khai", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 2, "a4d": 5, "a4m": 0}, {"rank": 17, "company": "CÔNG TY TNHH EPSON VIỆT NAM", "vertical": "Home & Electronics", "owner": "Thảo", "lifecycle": "Execution", "opp": 59, "act": 78, "combined": 137, "tier": "A-Hot", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 18, "company": "Hệ thống Đa khoa Quốc tế Sài Gòn (SIG)", "vertical": "Health Care", "owner": "My", "lifecycle": "Verbal Confirm", "opp": 49, "act": 86, "combined": 135, "tier": "A-Hot", "rec": "Push chốt hợp đồng trong quý", "d11": 4, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 10, "a2b": 15, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 19, "company": "CÔNG TY TNHH LOCK & LOCK HCM", "vertical": "Home & Electronics", "owner": "My", "lifecycle": "Execution", "opp": 63, "act": 71, "combined": 134, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 20, "company": "Đài Linh Group", "vertical": "Beauty", "owner": "Phương", "lifecycle": "Quotation Sent", "opp": 62, "act": 71, "combined": 133, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": 7, "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 21, "company": "CÔNG TY TNHH THIẾT BỊ Y TẾ - NHA KHOA VIỆT MỸ", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Quotation Sent", "opp": 61, "act": 71, "combined": 132, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": 7, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 6, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 22, "company": "SAYURIE", "vertical": "Beauty", "owner": "Đại", "lifecycle": "Execution", "opp": 57, "act": 74, "combined": 131, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 23, "company": "Trung Sơn Pharma", "vertical": "Health Care", "owner": "My", "lifecycle": "Execution", "opp": 63, "act": 68, "combined": 131, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 24, "company": "MIDEA Vietnam", "vertical": "Home & Electronics", "owner": "Phương", "lifecycle": "Qualified brief", "opp": 63, "act": 68, "combined": 131, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 20, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 25, "company": "LG Electronics", "vertical": "Home & Electronics", "owner": "Phương", "lifecycle": "Not Verbal Confirm", "opp": 69, "act": 61, "combined": 130, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 6, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 4, "d63": "-", "a1": 25, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 26, "company": "Edufit", "vertical": "Education", "owner": "Ngọc", "lifecycle": "Quotation Sent", "opp": 63, "act": 66, "combined": 129, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 27, "company": "CÔNG TY TRÁCH NHIỆM HỮU HẠN NƯỚC GIẢI KHÁT COCA-COLA VIỆT NAM", "vertical": "FMCG", "owner": "My", "lifecycle": "Quotation Sent", "opp": 53, "act": 75, "combined": 128, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 10, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 5}, {"rank": 28, "company": "Dermalogica Vietnam", "vertical": "Beauty", "owner": "Đại", "lifecycle": "Execution", "opp": 57, "act": 71, "combined": 128, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 29, "company": "CÔNG TY CP ĐƯỜNG QUẢNG NGÃI (Vinasoy)", "vertical": "FMCG", "owner": "Ngọc", "lifecycle": "Not Execution", "opp": 47, "act": 81, "combined": 128, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 1, "d62": 0, "d63": "-", "a1": 35, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 30, "company": "CÔNG TY CỔ PHẦN MARICO SOUTH EAST ASIA", "vertical": "FMCG", "owner": "Đại", "lifecycle": "Verbal Confirm", "opp": 46, "act": 81, "combined": 127, "tier": "B-Warm", "rec": "Push chốt hợp đồng trong quý", "d11": 1, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 5, "a2b": 15, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 31, "company": "KIDO - Thọ Phát", "vertical": "FMCG", "owner": "My", "lifecycle": "Execution", "opp": 57, "act": 70, "combined": 127, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 0}, {"rank": 32, "company": "Cathay United Bank", "vertical": "Finance", "owner": "Đại", "lifecycle": "Execution", "opp": 43, "act": 83, "combined": 126, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 33, "company": "CÔNG TY CỔ PHẦN DETECH BIO", "vertical": "FMCG", "owner": "My", "lifecycle": "Execution", "opp": 49, "act": 76, "combined": 125, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 34, "company": "RAIZEONE_Tagger", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Contract/ Deposit", "opp": 59, "act": 66, "combined": 125, "tier": "B-Warm", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 35, "company": "Công ty TNHH Sản xuất Tập đoàn Đại Việt", "vertical": "Home & Electronics", "owner": "Loan", "lifecycle": "Qualified lead", "opp": 66, "act": 58, "combined": 124, "tier": "B-Warm", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 36, "company": "Cetaphil", "vertical": "Beauty", "owner": "My", "lifecycle": "Execution", "opp": 53, "act": 71, "combined": 124, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 37, "company": "NGÂN HÀNG THƯƠNG MẠI CỔ PHẦN VIỆT NAM THƯƠNG TÍN", "vertical": "Finance", "owner": "My", "lifecycle": "Completed", "opp": 43, "act": 81, "combined": 124, "tier": "B-Warm", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 38, "company": "Hoan My Medical", "vertical": "Health Care", "owner": "My", "lifecycle": "Not Verbal Confirm", "opp": 53, "act": 71, "combined": 124, "tier": "B-Warm", "rec": "Đẩy nhanh chốt trong quý", "d11": 4, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 2, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 39, "company": "Thành Vinh Holdings Group_Seyoul Việt Nam", "vertical": "Beauty", "owner": "Ngọc", "lifecycle": "Contract/ Deposit", "opp": 57, "act": 66, "combined": 123, "tier": "B-Warm", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 40, "company": "CÔNG TY CỔ PHẦN PHÒNG KHÁM BỆNH VIỆN QUỐC TẾ MỸ", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 55, "act": 68, "combined": 123, "tier": "B-Warm", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 41, "company": "BCONS group", "vertical": "Real estate", "owner": "Đại", "lifecycle": "Execution", "opp": 53, "act": 70, "combined": 123, "tier": "B-Warm", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 2, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 5, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 42, "company": "Carezone Vietnam", "vertical": "Beauty", "owner": "Phương", "lifecycle": "Contract/ Deposit", "opp": 44, "act": 78, "combined": 122, "tier": "B-Warm", "rec": "Follow up triển khai", "d11": 1, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 2, "a4d": 5, "a4m": 5}, {"rank": 43, "company": "Nippon Paint", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Execution", "opp": 63, "act": 58, "combined": 121, "tier": "C-Nurt", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 0, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 0}, {"rank": 44, "company": "CÔNG TY TNHH HAFELE VIỆT NAM", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Qualified lead", "opp": 63, "act": 58, "combined": 121, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 45, "company": "MOI Cosmetic", "vertical": "Beauty", "owner": "My", "lifecycle": "Completed", "opp": 53, "act": 68, "combined": 121, "tier": "C-Nurt", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 46, "company": "CÔNG TY TNHH MANULIFE (VIỆT NAM)", "vertical": "Finance", "owner": "My", "lifecycle": "Qualified brief", "opp": 53, "act": 68, "combined": 121, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 20, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 47, "company": "Watsons Vietnam", "vertical": "Beauty", "owner": "Phương", "lifecycle": "Quotation Sent", "opp": 55, "act": 65, "combined": 120, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": 4, "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 2, "a4d": 5, "a4m": 0}, {"rank": 48, "company": "CÔNG TY TNHH ĐẠI HỌC FULBRIGHT VIỆT NAM", "vertical": "Education", "owner": "Thảo", "lifecycle": "Quotation Sent", "opp": 54, "act": 66, "combined": 120, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 7, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 49, "company": "Pharmacity", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Contact", "opp": 66, "act": 54, "combined": 120, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 3, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 50, "company": "Chill Cocktail", "vertical": "FMCG", "owner": "Phương", "lifecycle": "Quotation Sent", "opp": 62, "act": 58, "combined": 120, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": 7, "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 6, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 25, "a2a": 0, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 2, "a4d": 5, "a4m": 5}, {"rank": 51, "company": "Mutosi", "vertical": "Home & Electronics", "owner": "Phương", "lifecycle": "Not Verbal Confirm", "opp": 55, "act": 64, "combined": 119, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 6, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 52, "company": "BCONS PS LAND", "vertical": "Real estate", "owner": "Đại", "lifecycle": "Execution", "opp": 59, "act": 60, "combined": 119, "tier": "C-Nurt", "rec": "Theo dõi delivery quality", "d11": 10, "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 2, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 4, "d63": "-", "a1": 35, "a2a": 0, "a2b": 0, "a3i": 5, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 53, "company": "PHÒNG KHÁM CHUYÊN KHOA TRỊ LIỆU THẦN KINH CỘT SỐNG HOA KỲ", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 63, "act": 56, "combined": 119, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 54, "company": "NGÂN HÀNG ĐẠI CHÚNG TNHH KASIKORNBANK – CHI NHÁNH THÀNH PHỐ HỒ CHÍ MINH", "vertical": "Finance", "owner": "Thảo", "lifecycle": "Completed", "opp": 47, "act": 71, "combined": 118, "tier": "C-Nurt", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 55, "company": "CÔNG TY CỔ PHẦN GIẢI PHÁP GENE", "vertical": "Health Care", "owner": "Loan", "lifecycle": "Qualified lead", "opp": 55, "act": 63, "combined": 118, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 10, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 56, "company": "Huggies Vietnam", "vertical": "FMCG", "owner": "Đại", "lifecycle": "Execution", "opp": 53, "act": 65, "combined": 118, "tier": "C-Nurt", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 2, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 0, "a3i": 10, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 57, "company": "Hoan My Medical", "vertical": "Health Care", "owner": "My", "lifecycle": "Execution", "opp": 63, "act": 55, "combined": 118, "tier": "C-Nurt", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 0, "a2b": 0, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 0}, {"rank": 58, "company": "JOTUN VIETNAM COMPANY LIMITED", "vertical": "Home & Electronics", "owner": "Loan", "lifecycle": "Lead", "opp": 67, "act": 51, "combined": 118, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 6, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 59, "company": "Công ty TNHH JYSK Việt Nam", "vertical": "Home & Electronics", "owner": "Loan", "lifecycle": "Lead", "opp": 59, "act": 58, "combined": 117, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 60, "company": "CÔNG TY TNHH ĐIỆN TỬ THÔNG MINH TCL", "vertical": "Home & Electronics", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 59, "act": 58, "combined": 117, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 61, "company": "Ariston", "vertical": "Home & Electronics", "owner": "Đại", "lifecycle": "Brief", "opp": 59, "act": 58, "combined": 117, "tier": "C-Nurt", "rec": "Đẩy nhanh qualified tuần này", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 15, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 62, "company": "TDIC - Thuy Dung International Cosmetics", "vertical": "Beauty", "owner": "Phương", "lifecycle": "Qualified lead", "opp": 49, "act": 68, "combined": 117, "tier": "C-Nurt", "rec": "Follow up vào Q2 (T5)", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 63, "company": "CÔNG TY TNHH PIERREVAL VIỆT NAM", "vertical": "Real estate", "owner": "My", "lifecycle": "Verbal Confirm", "opp": 42, "act": 75, "combined": 117, "tier": "C-Nurt", "rec": "Push chốt hợp đồng trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 2, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 5, "a2b": 10, "a3i": 5, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 5}, {"rank": 64, "company": "NGÂN HÀNG THƯƠNG MẠI CỔ PHẦN QUỐC TẾ VIỆT NAM", "vertical": "Health Care", "owner": "My", "lifecycle": "Qualified lead", "opp": 59, "act": 58, "combined": 117, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 65, "company": "CÔNG TY TNHH RV GROUP VIỆT NAM", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Not Verbal Confirm", "opp": 55, "act": 61, "combined": 116, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 2, "d63": "-", "a1": 25, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 66, "company": "CÔNG TY CỔ PHẦN ẨM THỰC MẶT TRỜI VÀNG", "vertical": "FMCG", "owner": "Thảo", "lifecycle": "Not Verbal Confirm", "opp": 45, "act": 71, "combined": 116, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 0, "d63": "-", "a1": 25, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 67, "company": "Masterise Homes", "vertical": "Real estate", "owner": "Đại", "lifecycle": "Quotation Sent", "opp": 46, "act": 70, "combined": 116, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 2, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 10, "a3i": 5, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 68, "company": "CÔNG TY TNHH NONGSHIM VIETNAM", "vertical": "FMCG", "owner": "Loan", "lifecycle": "Lead", "opp": 53, "act": 63, "combined": 116, "tier": "C-Nurt", "rec": "Follow up vào Q2 (T4)", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 69, "company": "Apple Crumby", "vertical": "FMCG", "owner": "Ngọc", "lifecycle": "Qualified lead", "opp": 64, "act": 51, "combined": 115, "tier": "C-Nurt", "rec": "Follow up vào Q2 (T4)", "d11": "-", "d12": "-", "d13": "-", "d21": 10, "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 10, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 70, "company": "Want-Want", "vertical": "FMCG", "owner": "Phương", "lifecycle": "Quotation Sent", "opp": 52, "act": 63, "combined": 115, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 7, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 25, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 71, "company": "CÔNG TY CỔ PHẦN TẬP ĐOÀN TRUNG NGUYÊN", "vertical": "FMCG", "owner": "Thảo", "lifecycle": "Not Verbal Confirm", "opp": 49, "act": 66, "combined": 115, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 0, "d63": "-", "a1": 25, "a2a": 15, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 72, "company": "RAIZEONE_Mitsubishi Electric VN", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Contract/ Deposit", "opp": 59, "act": 56, "combined": 115, "tier": "C-Nurt", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 35, "a2a": 0, "a2b": 0, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 73, "company": "CÔNG TY TNHH BẢO HIỂM NHÂN THỌ SUN LIFE VIỆT NAM ", "vertical": "Finance", "owner": "Đại", "lifecycle": "Qualified lead", "opp": 47, "act": 68, "combined": 115, "tier": "C-Nurt", "rec": "Follow up vào Q3 (T8)", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 10, "a2a": 15, "a2b": 15, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 74, "company": "CÔNG TY CỔ PHẦN TẬP ĐOÀN PHƯỢNG HOÀNG XANH A&A", "vertical": "Health Care", "owner": "My", "lifecycle": "Not Qualified Brief", "opp": 61, "act": 53, "combined": 114, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 1, "d62": 2, "d63": "-", "a1": 15, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 75, "company": "Bosch Vietnam", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Lead", "opp": 59, "act": 55, "combined": 114, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 2, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 5, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 76, "company": "Locknlock (IMC 2024)", "vertical": "Home & Electronics", "owner": "Đại", "lifecycle": "Quotation Sent", "opp": 64, "act": 50, "combined": 114, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 2, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 25, "a2a": 0, "a2b": 0, "a3i": 10, "a3s": 5, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 77, "company": "The New Gym", "vertical": "Health Care", "owner": "Ngọc", "lifecycle": "Qualified brief", "opp": 53, "act": 61, "combined": 114, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": 4, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 20, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 78, "company": "CÔNG TY TNHH PHONG CÁCH SỐNG CHIRO ", "vertical": "Health Care", "owner": "Loan", "lifecycle": "Qualified lead", "opp": 66, "act": 48, "combined": 114, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 5}, {"rank": 79, "company": "CÔNG TY CỔ PHẦN KINH DOANH VÀ DỊCH VỤ BẤT ĐỘNG SẢN REALTY HOLDINGS", "vertical": "Real estate", "owner": "Ngọc", "lifecycle": "Contract/ Deposit", "opp": 46, "act": 68, "combined": 114, "tier": "C-Nurt", "rec": "Follow up triển khai", "d11": 4, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 5, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 80, "company": "Dược Hậu Giang", "vertical": "Health Care", "owner": "Phương", "lifecycle": "Not Qualified Brief", "opp": 53, "act": 61, "combined": 114, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 1, "d62": 0, "d63": "-", "a1": 15, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 81, "company": "La Bonita", "vertical": "Beauty", "owner": "Đại", "lifecycle": "Execution", "opp": 53, "act": 61, "combined": 114, "tier": "C-Nurt", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": 7, "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 0, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 82, "company": "HTP Pharma SNK", "vertical": "Beauty", "owner": "Phương", "lifecycle": "Verbal Confirm", "opp": 42, "act": 71, "combined": 113, "tier": "C-Nurt", "rec": "Push chốt hợp đồng trong quý", "d11": 1, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 30, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 83, "company": "CÔNG TY CỔ PHẦN SANOFI VIỆT NAM", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 59, "act": 53, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 84, "company": "CÔNG TY TNHH TIẾP CẬN GIÁO DỤC HOA KỲ", "vertical": "Education", "owner": "Loan", "lifecycle": "Lead", "opp": 66, "act": 46, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 85, "company": "CÔNG TY TNHH SANDOZ VIỆT NAM", "vertical": "Health Care", "owner": "Đại", "lifecycle": "Qualified lead", "opp": 66, "act": 46, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": 10, "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 4, "d63": "-", "a1": 10, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 86, "company": "RAIZEONE_Fujifilm Corporation", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Not Qualified Brief", "opp": 61, "act": 51, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": "-", "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 1, "d62": 2, "d63": "-", "a1": 15, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 87, "company": "CÔNG TY TNHH DƯỢC PHẨM ÍCH NHÂN", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Not Verbal Confirm", "opp": 51, "act": 61, "combined": 112, "tier": "C-Nurt", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 0, "d63": "-", "a1": 25, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 88, "company": "CÔNG TY CỔ PHẦN TẬP ĐOÀN DƯỢC PHẨM VÀ THƯƠNG MẠI SOHACO", "vertical": "FMCG", "owner": "Ngọc", "lifecycle": "Brief", "opp": 54, "act": 58, "combined": 112, "tier": "C-Nurt", "rec": "Đẩy nhanh qualified tuần này", "d11": 10, "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 15, "a2a": 5, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 89, "company": "CÔNG TY CỔ PHẦN BỆNH VIỆN ĐA KHOA QUỐC TẾ DNA", "vertical": "Health Care", "owner": "Đại", "lifecycle": "Lead", "opp": 59, "act": 53, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 90, "company": "CÔNG TY TNHH ASTRAZENECA VIỆT NAM", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 59, "act": 53, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 91, "company": "CÔNG TY TRÁCH NHIỆM HỮU HẠN Y TẾ VIỄN ĐÔNG VIỆT NAM", "vertical": "Health Care", "owner": "Thảo", "lifecycle": "Qualified lead", "opp": 59, "act": 53, "combined": 112, "tier": "C-Nurt", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 92, "company": "Inochi ", "vertical": "Home & Electronics", "owner": "Ngọc", "lifecycle": "Qualified lead", "opp": 55, "act": 56, "combined": 111, "tier": "D-Cold", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 10, "a2a": 15, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 93, "company": "CÔNG TY CỔ PHẦN MASTERTRAN", "vertical": "Health Care", "owner": "Đại", "lifecycle": "Not Verbal Confirm", "opp": 55, "act": 56, "combined": 111, "tier": "D-Cold", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 0, "d63": "-", "a1": 25, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 94, "company": "CÔNG TY TNHH TRUYỀN THÔNG AZVIDI", "vertical": "Real estate", "owner": "Thảo", "lifecycle": "Execution", "opp": 43, "act": 68, "combined": 111, "tier": "D-Cold", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 10, "a2b": 10, "a3i": 5, "a3s": 1, "a3l": 5, "a4s": 2, "a4d": 0, "a4m": 0}, {"rank": 95, "company": "CÔNG TY TNHH SUCCESS TOGETHER", "vertical": "Beauty", "owner": "Thảo", "lifecycle": "Contract/ Deposit", "opp": 45, "act": 66, "combined": 111, "tier": "D-Cold", "rec": "Follow up triển khai", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 35, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 96, "company": "Philips", "vertical": "Home & Electronics", "owner": "Phương", "lifecycle": "Lead", "opp": 63, "act": 48, "combined": 111, "tier": "D-Cold", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 15, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 97, "company": "Bệnh viện đa khoa Tâm Anh", "vertical": "Health Care", "owner": "Phương", "lifecycle": "Lead", "opp": 59, "act": 51, "combined": 110, "tier": "D-Cold", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 0, "d63": "-", "a1": 5, "a2a": 10, "a2b": 10, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 5}, {"rank": 98, "company": "Carlsberg Vietnam", "vertical": "FMCG", "owner": "Ngọc", "lifecycle": "Not Verbal Confirm", "opp": 49, "act": 61, "combined": 110, "tier": "D-Cold", "rec": "Đẩy nhanh chốt trong quý", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 5, "d23": 5, "d31": 5, "d32": "-", "d33": "-", "d41": 4, "d42": 3, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 0, "d62": 2, "d63": "-", "a1": 25, "a2a": 10, "a2b": 5, "a3i": 10, "a3s": 1, "a3l": 5, "a4s": 5, "a4d": 0, "a4m": 0}, {"rank": 99, "company": "Công ty Cổ phần Đa khoa Quốc tế Vinmec", "vertical": "Health Care", "owner": "Ngọc", "lifecycle": "Qualified lead", "opp": 64, "act": 46, "combined": 110, "tier": "D-Cold", "rec": "Cửa sổ pitch - tiếp cận ngay", "d11": 7, "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 5, "d31": 10, "d32": "-", "d33": "-", "d41": 4, "d42": 5, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 2, "d62": 2, "d63": "-", "a1": 10, "a2a": 5, "a2b": 5, "a3i": 10, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 5, "a4m": 0}, {"rank": 100, "company": "Công ty TNHH Quản lý Tài sản Quốc tế Mapletree", "vertical": "Real estate", "owner": "Loan", "lifecycle": "Execution", "opp": 39, "act": 71, "combined": 110, "tier": "D-Cold", "rec": "Theo dõi delivery quality", "d11": "-", "d12": "-", "d13": "-", "d21": "-", "d22": 3, "d23": 3, "d31": 2, "d32": "-", "d33": "-", "d41": 4, "d42": 1, "d43": "-", "d51": 0, "d52": 0, "d53": 0, "d61": 4, "d62": 2, "d63": "-", "a1": 35, "a2a": 5, "a2b": 10, "a3i": 5, "a3s": 3, "a3l": 3, "a4s": 5, "a4d": 0, "a4m": 5}];
+const vc=v=>({'Finance':'v-fin','Beauty':'v-bea','Health Care':'v-hc','FMCG':'v-fmcg','Home & Electronics':'v-he','Education':'v-edu','Auto':'v-auto','Real estate':'v-re'}[v]||'v-oth');
+const rc=r=>{if(r.includes('chốt')||r.includes('Push')||r.includes('qualified'))return 'rec-push';if(r.includes('pitch')||r.includes('tiếp cận'))return 'rec-pitch';if(r.includes('Follow up')&&!r.includes('triển khai'))return 'rec-follow';if(r.includes('delivery')||r.includes('triển khai'))return 'rec-delivery';return 'rec-done';};
+const dv=(v,mx)=>{if(v==='-')return '<span class="val-na">-</span>';if(v===0)return '<span class="val-zero">0</span>';const p=v/mx;const c=p>=.7?'val-hi':p>=.4?'val-mid':'val-lo';return `<span class="${c}">${v}</span>`;};
+const dvt=(v,mx)=>{if(v==='-')return 'd-na';if(v===0)return 'd-zero';return v/mx>=.7?'d-hi':'d';};
+
+let fTier='all',fAct='all';
+function switchTab(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function setTier(t,el){fTier=t;document.querySelectorAll('[data-tier]').forEach(b=>b.className='btn');el.classList.add('btn','on');render();}
+function setAction(a,el){fAct=a;document.querySelectorAll('[data-act]').forEach(b=>b.className='btn');el.classList.add('btn',a==='q-now'?'on-push':a==='q-next'?'on-warm':'on');render();}
+function isQnow(r){return r.includes('chốt')||r.includes('Push')||r.includes('qualified')||r.includes('pitch')||r.includes('tiếp cận');}
+function isQnext(r){return r.includes('Follow up')&&!r.includes('triển khai');}
+function isDelivery(r){return r.includes('delivery')||r.includes('triển khai');}
+function toggleRow(id){const el=document.getElementById('exp-'+id);el.classList.toggle('open');}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  let f=DATA;
+  if(fTier!=='all')f=f.filter(d=>d.tier===fTier);
+  if(fAct==='q-now')f=f.filter(d=>isQnow(d.rec));
+  else if(fAct==='q-next')f=f.filter(d=>isQnext(d.rec));
+  else if(fAct==='delivery')f=f.filter(d=>isDelivery(d.rec));
+  if(q)f=f.filter(d=>d.company.toLowerCase().includes(q)||d.vertical.toLowerCase().includes(q)||d.owner.toLowerCase().includes(q));
+  const tiers={'A-Hot':0,'B-Warm':0,'C-Nurt':0,'D-Cold':0};f.forEach(d=>tiers[d.tier]++);
+  const cls={'A-Hot':'hot','B-Warm':'warm','C-Nurt':'nurt','D-Cold':'cold'};
+  document.getElementById('stats').innerHTML=Object.entries(tiers).map(([t,n])=>`<div class="stat ${cls[t]}"><div class="n">${n}</div><div class="l">${t}</div></div>`).join('');
+  document.getElementById('countTag').textContent=f.length+' cong ty';
+  document.getElementById('tbody').innerHTML=f.map(d=>{
+    const tc='tier-'+d.tier[0];
+    return `<tr class="main-row" onclick="toggleRow(${d.rank})">
+<td class="d">${d.rank}</td><td class="left company">${d.company}</td><td><span class="vert-tag ${vc(d.vertical)}">${d.vertical}</span></td><td class="owner">${d.owner}</td><td class="stg">${d.lifecycle}</td><td><span class="tier-badge ${tc}">${d.tier}</span></td>
+<td class="${dvt(d.d11,10)}">${dv(d.d11,10)}</td><td class="${dvt(d.d12,8)}">${dv(d.d12,8)}</td><td class="${dvt(d.d13,7)}">${dv(d.d13,7)}</td>
+<td class="${dvt(d.d21,10)}">${dv(d.d21,10)}</td><td class="${dvt(d.d22,5)}">${dv(d.d22,5)}</td><td class="${dvt(d.d23,5)}">${dv(d.d23,5)}</td>
+<td class="${dvt(d.d31,10)}">${dv(d.d31,10)}</td><td class="${dvt(d.d32,5)}">${dv(d.d32,5)}</td><td class="${dvt(d.d33,5)}">${dv(d.d33,5)}</td>
+<td class="${dvt(d.d41,6)}">${dv(d.d41,6)}</td><td class="${dvt(d.d42,5)}">${dv(d.d42,5)}</td><td class="${dvt(d.d43,4)}">${dv(d.d43,4)}</td>
+<td class="${dvt(d.d51,5)}">${dv(d.d51,5)}</td><td class="${dvt(d.d52,3)}">${dv(d.d52,3)}</td><td class="${dvt(d.d53,2)}">${dv(d.d53,2)}</td>
+<td class="${dvt(d.d61,4)}">${dv(d.d61,4)}</td><td class="${dvt(d.d62,4)}">${dv(d.d62,4)}</td><td class="${dvt(d.d63,2)}">${dv(d.d63,2)}</td>
+<td class="sc-opp">${d.opp}</td>
+<td class="d">${d.a1}</td><td class="d">${d.a2a}</td><td class="d">${d.a2b}</td><td class="d">${d.a3i}</td><td class="d">${d.a3s}</td><td class="d">${d.a3l}</td><td class="d">${d.a4s}</td><td class="d">${d.a4d}</td><td class="d">${d.a4m}</td>
+<td class="sc-act">${d.act}</td><td class="sc-total">${d.combined}</td><td class="rec ${rc(d.rec)}">${d.rec}</td>
+</tr>
+<tr class="expand-row" id="exp-${d.rank}"><td colspan="37">
+<div class="detail-grid">
+<div class="detail-box"><h4>D1. Tiem nang Doanh thu (max 25)</h4>
+<div class="detail-item"><span class="lbl">D1.1 Quy mo deal (max 10)</span>${dv(d.d11,10)}</div>
+<div class="detail-item"><span class="lbl">D1.2 Ty suat GP2% (max 8)</span>${dv(d.d12,8)}</div>
+<div class="detail-item"><span class="lbl">D1.3 Xu huong CLV (max 7)</span>${dv(d.d13,7)}</div></div>
+<div class="detail-box"><h4>D2. Phu hop San pham (max 20)</h4>
+<div class="detail-item"><span class="lbl">D2.1 SP chinh khop (max 10)</span>${dv(d.d21,10)}</div>
+<div class="detail-item"><span class="lbl">D2.2 Tiem nang ban cheo (max 5)</span>${dv(d.d22,5)}</div>
+<div class="detail-item"><span class="lbl">D2.3 Chien luoc Ansoff (max 5)</span>${dv(d.d23,5)}</div></div>
+<div class="detail-box"><h4>D3. Thoi diem Mua vu (max 20)</h4>
+<div class="detail-item"><span class="lbl">D3.1 Cua so pitch (max 10)</span>${dv(d.d31,10)}</div>
+<div class="detail-item"><span class="lbl">D3.2 Chu ky ngan sach (max 5)</span>${dv(d.d32,5)}</div>
+<div class="detail-item"><span class="lbl">D3.3 Campaign da biet (max 5)</span>${dv(d.d33,5)}</div></div>
+<div class="detail-box"><h4>D4. Cau truc Mua hang (max 15)</h4>
+<div class="detail-item"><span class="lbl">D4.1 Toc do quyet dinh (max 6)</span>${dv(d.d41,6)}</div>
+<div class="detail-item"><span class="lbl">D4.2 Cap lien he (max 5)</span>${dv(d.d42,5)}</div>
+<div class="detail-item"><span class="lbl">D4.3 Quy trinh mua (max 4)</span>${dv(d.d43,4)}</div></div>
+<div class="detail-box"><h4>D5. Nang luc Trien khai (max 10)</h4>
+<div class="detail-item"><span class="lbl">D5.1 CoE capacity (max 5)</span>${dv(d.d51,5)}</div>
+<div class="detail-item"><span class="lbl">D5.2 Timeline (max 3)</span>${dv(d.d52,3)}</div>
+<div class="detail-item"><span class="lbl">D5.3 Team level (max 2)</span>${dv(d.d53,2)}</div></div>
+<div class="detail-box"><h4>D6. Lich su Quan he (max 10)</h4>
+<div class="detail-item"><span class="lbl">D6.1 Quan he cu (max 4)</span>${dv(d.d61,4)}</div>
+<div class="detail-item"><span class="lbl">D6.2 Referral (max 4)</span>${dv(d.d62,4)}</div>
+<div class="detail-item"><span class="lbl">D6.3 Vi the canh tranh (max 2)</span>${dv(d.d63,2)}</div></div>
+</div>
+<div class="detail-grid" style="margin-top:10px">
+<div class="detail-box"><h4>A1. Pipeline (max 35)</h4>
+<div class="detail-item"><span class="lbl">Stage: ${d.lifecycle}</span><span class="val-hi">${d.a1}</span></div></div>
+<div class="detail-box"><h4>A2. Tuong tac (max 30)</h4>
+<div class="detail-item"><span class="lbl">So lan lien he (max 15)</span><span class="sc">${d.a2a}</span></div>
+<div class="detail-item"><span class="lbl">Kenh + Recency (max 15)</span><span class="sc">${d.a2b}</span></div></div>
+<div class="detail-box"><h4>A3. ICP (20) + A4. Momentum (15)</h4>
+<div class="detail-item"><span class="lbl">Nganh fit (10)</span><span class="sc">${d.a3i}</span></div>
+<div class="detail-item"><span class="lbl">Quy mo (5)</span><span class="sc">${d.a3s}</span></div>
+<div class="detail-item"><span class="lbl">Vi tri (5)</span><span class="sc">${d.a3l}</span></div>
+<div class="detail-item"><span class="lbl">Active source (5)</span><span class="sc">${d.a4s}</span></div>
+<div class="detail-item"><span class="lbl">Open deal (5)</span><span class="sc">${d.a4d}</span></div>
+<div class="detail-item"><span class="lbl">Milestone (5)</span><span class="sc">${d.a4m}</span></div></div>
+</div>
+</td></tr>`;
+  }).join('');
+}
+document.getElementById('search').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
